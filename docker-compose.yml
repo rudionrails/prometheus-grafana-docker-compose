@@ -30,7 +30,7 @@ services:
 
   node-exporter:
     container_name: node-exporter
-    image: quay.io/prometheus/node-exporter:v1.5.0
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION}
     ports:
       - 9100:9100
     networks:
@@ -40,7 +40,7 @@ services:
 
   alertmanager:
     container_name: alertmanager
-    image: prom/alertmanager
+    image: prom/alertmanager:${ALERTMANAGER_VERSION}
     depends_on:
       - prometheus
     ports:
