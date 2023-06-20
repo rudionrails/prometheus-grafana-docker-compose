@@ -33,16 +33,14 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  # - job_name: 'cadvisor'
-  #
-  #   # Override the global default and scrape targets from this job every 5 seconds.
-  #   scrape_interval: 15s
-  #
-  #   static_configs:
-  #     - targets: ['cadvisor:8080']
-  #
-  - job_name: 'node-exporter'
-    # Override the global default and scrape targets from this job every 5 seconds.
-    scrape_interval: 15s
+  - job_name: 'My Laptop'
+    honor_labels: true
+    scrape_interval: 5s
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter-1:9100"]
+        labels:
+          group: App
+      - targets: ["node-exporter-2:9100"]
+        labels:
+          type: System
+          group: Web

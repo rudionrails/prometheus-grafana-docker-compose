@@ -1,0 +1,47 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+# # forward own logs
+# - job_name: system
+#   static_configs:
+#   - targets:
+#       - localhost
+#     labels:
+#       job: varlogs
+#       __path__: /var/log/*log
+
+- job_name: integrations/iis
+  static_configs:
+  - targets:
+    - localhost
+    labels:
+      job: integrations/iis
+      instance: localhost
+      site: MBIB
+      __path__: /var/log/iis/**/*log
+      # instance: <your-instance-name>
+      # site: <your-site1-name>
+      # __path__: /inetpub/logs/LogFiles/W3SVC<site1-id>/u_ex*.log
+
+  pipeline_stages:
+  - match:
+      selector: '{job="integrations/iis"}'
+      stages:
+      - drop:
+          expression: "^#"
+      - regex:
+          expression: >-
+            ^(?P<timestamp>[\d\-]+ [\d:]+) (?P<s_ip>[\d.:]+) (?P<cs_method>[A-Z]+) (?P<cs_uri>.+?) .+? (?P<c_port>\d+) (?P<cs_username>.+?) (?P<c_ip>[\d.:]+) (?P<cs_agent>.+?) (?P<cs_referrer>.+?) (?P<sc_status>\d+) (?P<sc_substatus>\d+) (?P<sc_win32_status>\d+) (?P<time_taken>\d+)
+      - labels:
+          host: s_ip
+      - timestamp:
+          source: timestamp
+          format: 2006-01-02 15:04:05
